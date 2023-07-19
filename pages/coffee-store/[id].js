@@ -8,8 +8,9 @@ import cls from 'classnames';
 import classNames from 'classnames';
 import { fetchCoffeeStores } from '../../lib/coffee-stores';
 import { useContext, useEffect, useState } from 'react';
-import { isEmpty } from '../../utils';
+import { isEmpty, fetcher } from '../../utils';
 import { StoreContext } from '../../store/store-context';
+import useSWR from 'swr';
 
 export async function getStaticProps(staticProps) {
   const params = staticProps.params;
@@ -101,9 +102,27 @@ const CoffeeStore = (initialProps) => {
 
   const { address, neighbourhood, name, imgUrl } = coffeeStore;
 
+  const [votingCount, setVotingCount] = useState(1);
+
+  const { data, error } = useSWR(`/api/getCoffeeStoreById?id=${id}`, fetcher);
+
+  useEffect(() => {
+    if (data && data.length > 0) {
+      console.log('data from SWR', data);
+      setCoffeeStore(data[0]);
+      setVotingCount(data[0].voting);
+    }
+  }, [data]);
+
   const handleUpVoteButton = () => {
     console.log('Handle Upvote!');
+    let count = votingCount + 1;
+    setVotingCount(count);
   };
+
+  if (error) {
+    return <div>Something went wrong retrieving coffee store page</div>;
+  }
 
   if (router.isFallback) {
     return <div>Loading...</div>;
@@ -165,7 +184,7 @@ const CoffeeStore = (initialProps) => {
               height={24}
               alt='rating'
             />
-            <p className={styles.text}>1</p>
+            <p className={styles.text}>{votingCount}</p>
           </div>
           <button className={styles.upvoteButton} onClick={handleUpVoteButton}>
             Up vote!
