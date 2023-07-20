@@ -1,13 +1,13 @@
 import Head from 'next/head';
-import styles from '../styles/Home.module.css';
-import Banner from '../components/banner';
 import Image from 'next/image';
-import Card from '../components/card';
+import styles from '../styles/Home.module.css';
 
-import coffeeStoresData from '../data/coffee-stores.json';
+import Banner from '../components/banner';
+import Card from '../components/card';
 import { fetchCoffeeStores } from '../lib/coffee-stores';
+
 import useTrackLocation from '../hooks/use-track-location';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { ACTION_TYPES, StoreContext } from '../store/store-context';
 
 export async function getStaticProps(context) {
@@ -15,7 +15,7 @@ export async function getStaticProps(context) {
   return {
     props: {
       coffeeStores,
-    },
+    }, // will be passed to the page component as props
   };
 }
 
@@ -23,36 +23,43 @@ export default function Home(props) {
   const { handleTrackLocation, locationErrorMsg, isFindingLocation } =
     useTrackLocation();
 
-  // const [coffeeStores, setCoffeeStores] = useState('');
+  // const [coffeeStores, setCoffeeStores] = useState("");
+
   const [coffeeStoresError, setCoffeeStoresError] = useState(null);
+
   const { dispatch, state } = useContext(StoreContext);
+
   const { coffeeStores, latLong } = state;
 
   useEffect(() => {
-    async function setCoffeeStoresByLocation() {
+    const setCoffeeStoresByLocation = async () => {
       if (latLong) {
         try {
-          // const fetchedCoffeeStores = await fetchCoffeeStores(latLong, 30);
           const response = await fetch(
             `/api/getCoffeeStoresByLocation?latLong=${latLong}&limit=30`
           );
+
           const coffeeStores = await response.json();
+
           // setCoffeeStores(fetchedCoffeeStores);
           dispatch({
             type: ACTION_TYPES.SET_COFFEE_STORES,
-            payload: { coffeeStores },
+            payload: {
+              coffeeStores,
+            },
           });
           setCoffeeStoresError('');
+          //set coffee stores
         } catch (error) {
-          // set error
+          //set error
           setCoffeeStoresError(error.message);
         }
       }
-    }
+    };
     setCoffeeStoresByLocation();
-  }, [latLong]);
+  }, [latLong, dispatch]);
 
-  const handleOnBannerButtonClick = () => {
+  const handleOnBannerBtnClick = () => {
     handleTrackLocation();
   };
 
@@ -61,12 +68,17 @@ export default function Home(props) {
       <Head>
         <title>Coffee Connoisseur</title>
         <link rel='icon' href='/favicon.ico' />
+
+        <meta
+          name='description'
+          content='allows you to discover coffee stores'
+        ></meta>
       </Head>
 
       <main className={styles.main}>
         <Banner
           buttonText={isFindingLocation ? 'Locating...' : 'View stores nearby'}
-          handleOnClick={handleOnBannerButtonClick}
+          handleOnClick={handleOnBannerBtnClick}
         />
         {locationErrorMsg && <p>Something went wrong: {locationErrorMsg}</p>}
         {coffeeStoresError && <p>Something went wrong: {coffeeStoresError}</p>}
@@ -75,7 +87,7 @@ export default function Home(props) {
             src='/static/hero-image.png'
             width={700}
             height={400}
-            alt='hero'
+            alt='hero image'
           />
         </div>
 
@@ -93,7 +105,6 @@ export default function Home(props) {
                       'https://images.unsplash.com/photo-1504753793650-d4a2b783c15e?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80'
                     }
                     href={`/coffee-store/${coffeeStore.id}`}
-                    className={styles.card}
                   />
                 );
               })}
@@ -115,7 +126,6 @@ export default function Home(props) {
                       'https://images.unsplash.com/photo-1504753793650-d4a2b783c15e?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=2000&q=80'
                     }
                     href={`/coffee-store/${coffeeStore.id}`}
-                    className={styles.card}
                   />
                 );
               })}
@@ -126,6 +136,3 @@ export default function Home(props) {
     </div>
   );
 }
-
-// airtable api key - patxse4npZ9UELyvX.17c49ae78266815d1cd39a1def6ce8e7a243cb06e50881fe0d325d7092daa2f0
-// token id - patxse4npZ9UELyvX
