@@ -9,7 +9,7 @@ body {
   background-repeat: no-repeat;
   background-size: cover;
   color: #373b64;
-  height: 100%;
+  /* height: 100vh; */
 }
 
 @font-face {
