@@ -7,10 +7,10 @@ const CoffeeStore = () => {
     <div>
       Coffee Store Page {router.query.id}
       <Link href='/'>
-        <a>Back to home</a>
+        Back to home
       </Link>
       <Link href='/coffee-store/dynamic'>
-        <a>Back to page dynamic</a>
+        Back to page dynamic
       </Link>
     </div>
   );

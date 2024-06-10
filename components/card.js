@@ -4,7 +4,7 @@ import Styles from './card.module.css';
 
 const Card = (props) => {
   return (
-    <Link href={props.href}>
+    <Link href={props.href} legacyBehavior>
       <div>
         <h2>{props.name}</h2>
         <Image src={props.imgUrl} width={260} height={160} />
