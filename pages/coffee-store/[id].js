@@ -68,7 +68,7 @@ const CoffeeStore = (props) => {
             width={600}
             height={360}
             className={styles.storeImg}
-            alt={name}
+            alt='coffee'
           />
         </div>
         <div className={cls('glass', styles.col2)}>
