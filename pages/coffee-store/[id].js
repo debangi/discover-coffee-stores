@@ -7,8 +7,8 @@ import styles from '../../styles/coffee-store.module.css';
 import Image from 'next/image';
 import cls from 'classnames';
 import { useContext, useEffect, useState } from 'react';
-import { StoreContext } from '../_app';
 import { isEmpty } from '@/utils';
+import { StoreContext } from '@/store/store-context';
 
 export async function getStaticProps(staticProps) {
   const params = staticProps.params;
