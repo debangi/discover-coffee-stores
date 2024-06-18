@@ -6,6 +6,9 @@ import Head from 'next/head';
 import styles from '../../styles/coffee-store.module.css';
 import Image from 'next/image';
 import cls from 'classnames';
+import { useContext, useEffect, useState } from 'react';
+import { StoreContext } from '../_app';
+import { isEmpty } from '@/utils';
 
 export async function getStaticProps(staticProps) {
   const params = staticProps.params;
@@ -34,14 +37,34 @@ export async function getStaticPaths() {
     fallback: true,
   };
 }
-const CoffeeStore = (props) => {
+
+const CoffeeStore = (initialProps) => {
   const router = useRouter();
 
   if (router.isFallback) {
     return <div>Loading ...</div>;
   }
 
-  const { address, name, imgUrl, neighbourhood } = props.coffeeStore;
+  const id = router.query.id;
+
+  const [coffeeStore, setCoffeeStore] = useState(initialProps.coffeeStore);
+
+  const {
+    state: { coffeeStores },
+  } = useContext(StoreContext);
+
+  useEffect(() => {
+    if (isEmpty(initialProps.coffeeStore)) {
+      if (coffeeStores.length > 0) {
+        const findCoffeeStoreById = coffeeStores.find((coffeeStore) => {
+          return coffeeStore.id.toString() === id;
+        });
+        setCoffeeStore(findCoffeeStoreById);
+      }
+    }
+  }, [id]);
+
+  const { address, name, imgUrl, neighbourhood } = coffeeStore;
 
   const handleUpVoteButton = () => {
     console.log('handle upvote');
